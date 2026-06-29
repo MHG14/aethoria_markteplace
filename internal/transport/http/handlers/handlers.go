@@ -2,8 +2,6 @@ package handlers
 
 import "github.com/MHG14/aethoria_marketplace/internal/application"
 
-// Handlers bundles all handler groups.
-// Passed as a single dependency to the server.
 type Handlers struct {
 	Item    *ItemHandler
 	Listing *ListingHandler
