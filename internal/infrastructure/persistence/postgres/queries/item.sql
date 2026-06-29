@@ -16,4 +16,7 @@ UPDATE items SET status = $2 WHERE id = $1 RETURNING *;
 UPDATE items SET owner_id = $2, status = 'available' WHERE id = $1 RETURNING *;
 
 -- name: ListItems :many
+SELECT * FROM items;
+
+-- name: ListItemsByOwner :many
 SELECT * FROM items WHERE owner_id = $1;

@@ -8,15 +8,26 @@ import (
 )
 
 func (r *guildRepo) Create(ctx context.Context, g guild.Guild) (guild.Guild, error) {
-	//row, err := r.q.(ctx, db.CreateGuildParams{
-	//	Name:       g.Name,
-	//	DailyLimit: g.DailyLimit,
-	//})
-	//if err != nil {
-	//	return guild.Guild{}, err
-	//}
-	//return toGuild(row), nil
-	return guild.Guild{}, nil
+	row, err := r.q.CreateGuild(ctx, &db.CreateGuildParams{
+		Name:       g.Name,
+		TotalMoney: g.TotalMoney,
+		DailyLimit: g.DailyLimit,
+	})
+	if err != nil {
+		return guild.Guild{}, err
+	}
+	return toGuild(row), nil
+}
+
+func (r *guildRepo) TopUp(ctx context.Context, id int64, amount int64) (guild.Guild, error) {
+	row, err := r.q.TopUpGuildWallet(ctx, &db.TopUpGuildWalletParams{
+		ID:     id,
+		Amount: amount,
+	})
+	if err != nil {
+		return guild.Guild{}, err
+	}
+	return toGuild(row), nil
 }
 
 func (r *guildRepo) GetByID(ctx context.Context, id int64) (guild.Guild, error) {

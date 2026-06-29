@@ -60,3 +60,20 @@ func (h *GuildHandler) GetTransactions(c *fiber.Ctx) error {
 	}
 	return c.JSON(result)
 }
+
+func (h *GuildHandler) TopUp(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+	var req application.TopUpWalletRequest
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.ErrBadRequest
+	}
+	req.GuildID = int64(id)
+	result, err := h.app.TopUpWallet(c.Context(), req)
+	if err != nil {
+		return err
+	}
+	return c.JSON(result)
+}

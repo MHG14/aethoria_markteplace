@@ -75,11 +75,41 @@ func (q *Queries) GetItemForUpdate(ctx context.Context, id int64) (*Item, error)
 }
 
 const listItems = `-- name: ListItems :many
+SELECT id, name, type, status, owner_id FROM items
+`
+
+func (q *Queries) ListItems(ctx context.Context) ([]*Item, error) {
+	rows, err := q.db.Query(ctx, listItems)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Item
+	for rows.Next() {
+		var i Item
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Type,
+			&i.Status,
+			&i.OwnerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listItemsByOwner = `-- name: ListItemsByOwner :many
 SELECT id, name, type, status, owner_id FROM items WHERE owner_id = $1
 `
 
-func (q *Queries) ListItems(ctx context.Context, ownerID int64) ([]*Item, error) {
-	rows, err := q.db.Query(ctx, listItems, ownerID)
+func (q *Queries) ListItemsByOwner(ctx context.Context, ownerID int64) ([]*Item, error) {
+	rows, err := q.db.Query(ctx, listItemsByOwner, ownerID)
 	if err != nil {
 		return nil, err
 	}

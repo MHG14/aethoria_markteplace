@@ -36,8 +36,20 @@ func (r *itemRepo) GetByIDForUpdate(ctx context.Context, id int64) (item.Item, e
 	return toItem(row), nil
 }
 
-func (r *itemRepo) List(ctx context.Context, ownerID int64) ([]item.Item, error) {
-	rows, err := r.q.ListItems(ctx, ownerID)
+func (r *itemRepo) List(ctx context.Context) ([]item.Item, error) {
+	rows, err := r.q.ListItems(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]item.Item, len(rows))
+	for i, row := range rows {
+		items[i] = toItem(row)
+	}
+	return items, nil
+}
+
+func (r *itemRepo) ListByOwner(ctx context.Context, ownerID int64) ([]item.Item, error) {
+	rows, err := r.q.ListItemsByOwner(ctx, ownerID)
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ func (s *Server) registerRoutes() {
 	api.Post("/items", s.handlers.Item.Create)
 	api.Get("/items", s.handlers.Item.List)
 	api.Get("/items/:id", s.handlers.Item.Get)
+	api.Get("/guilds/:id/items", s.handlers.Item.ListByOwner)
 
 	// listings
 	api.Post("/listings", s.handlers.Listing.Create)
@@ -26,5 +27,6 @@ func (s *Server) registerRoutes() {
 	api.Post("/guilds", s.handlers.Guild.Create)
 	api.Get("/guilds/:id", s.handlers.Guild.Get)
 	api.Get("/guilds/:id/wallet", s.handlers.Guild.GetWallet)
+	api.Post("/:id/topup", s.handlers.Guild.TopUp)
 	api.Get("/guilds/:id/transactions", s.handlers.Guild.GetTransactions)
 }

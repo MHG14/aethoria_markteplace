@@ -9,6 +9,32 @@ import (
 	"context"
 )
 
+const createGuild = `-- name: CreateGuild :one
+INSERT INTO guilds (name, total_money, daily_limit)
+VALUES ($1, $2, $3)
+    RETURNING id, name, total_money, reserved_money, daily_limit, daily_spent
+`
+
+type CreateGuildParams struct {
+	Name       string
+	TotalMoney int64
+	DailyLimit int64
+}
+
+func (q *Queries) CreateGuild(ctx context.Context, arg *CreateGuildParams) (*Guild, error) {
+	row := q.db.QueryRow(ctx, createGuild, arg.Name, arg.TotalMoney, arg.DailyLimit)
+	var i Guild
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.TotalMoney,
+		&i.ReservedMoney,
+		&i.DailyLimit,
+		&i.DailySpent,
+	)
+	return &i, err
+}
+
 const getGuild = `-- name: GetGuild :one
 SELECT id, name, total_money, reserved_money, daily_limit, daily_spent FROM guilds WHERE id = $1
 `
@@ -52,6 +78,32 @@ UPDATE guilds SET daily_spent = 0
 func (q *Queries) ResetDailySpent(ctx context.Context) error {
 	_, err := q.db.Exec(ctx, resetDailySpent)
 	return err
+}
+
+const topUpGuildWallet = `-- name: TopUpGuildWallet :one
+UPDATE guilds
+SET total_money = total_money + $1
+WHERE id = $2
+    RETURNING id, name, total_money, reserved_money, daily_limit, daily_spent
+`
+
+type TopUpGuildWalletParams struct {
+	Amount int64
+	ID     int64
+}
+
+func (q *Queries) TopUpGuildWallet(ctx context.Context, arg *TopUpGuildWalletParams) (*Guild, error) {
+	row := q.db.QueryRow(ctx, topUpGuildWallet, arg.Amount, arg.ID)
+	var i Guild
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.TotalMoney,
+		&i.ReservedMoney,
+		&i.DailyLimit,
+		&i.DailySpent,
+	)
+	return &i, err
 }
 
 const updateGuildWallet = `-- name: UpdateGuildWallet :one

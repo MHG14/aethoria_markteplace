@@ -16,7 +16,6 @@ type CancelBidRequest struct {
 }
 
 func (a *App) CancelBid(ctx context.Context, req CancelBidRequest) error {
-	// reads and validation outside tx
 	auc, err := a.repos.Auction.GetByID(ctx, req.AuctionID)
 	if err != nil {
 		return fmt.Errorf("auction not found: %w", ErrNotFound)
@@ -40,7 +39,6 @@ func (a *App) CancelBid(ctx context.Context, req CancelBidRequest) error {
 	}
 
 	return a.repos.TxManager.WithTx(ctx, func(ctx context.Context, repos repository.Repositories) error {
-		// re-read with FOR UPDATE inside tx
 		auc, err := repos.Auction.GetByIDForUpdate(ctx, req.AuctionID)
 		if err != nil {
 			return fmt.Errorf("auction not found: %w", ErrNotFound)

@@ -33,6 +33,18 @@ func (h *ItemHandler) List(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+func (h *ItemHandler) ListByOwner(c *fiber.Ctx) error {
+	ownerID, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+	result, err := h.app.ListItemsByOwner(c.Context(), int64(ownerID))
+	if err != nil {
+		return err
+	}
+	return c.JSON(result)
+}
+
 func (h *ItemHandler) Get(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {

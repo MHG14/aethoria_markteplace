@@ -17,7 +17,8 @@ type ItemRepository interface {
 	Create(ctx context.Context, i item.Item) (item.Item, error)
 	GetByID(ctx context.Context, id int64) (item.Item, error)
 	GetByIDForUpdate(ctx context.Context, id int64) (item.Item, error)
-	List(ctx context.Context, ownerID int64) ([]item.Item, error)
+	List(ctx context.Context) ([]item.Item, error)
+	ListByOwner(ctx context.Context, ownerID int64) ([]item.Item, error)
 	UpdateStatus(ctx context.Context, id int64, status item.Status) (item.Item, error)
 	UpdateOwner(ctx context.Context, id int64, ownerID int64) (item.Item, error)
 }
@@ -27,6 +28,7 @@ type GuildRepository interface {
 	GetByID(ctx context.Context, id int64) (guild.Guild, error)
 	GetByIDForUpdate(ctx context.Context, id int64) (guild.Guild, error)
 	UpdateWallet(ctx context.Context, id int64, total, reserved, dailySpent int64) (guild.Guild, error)
+	TopUp(ctx context.Context, id int64, amount int64) (guild.Guild, error)
 }
 
 type ListingRepository interface {
