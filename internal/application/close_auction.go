@@ -28,7 +28,6 @@ func (a *App) CloseExpiredAuctions(ctx context.Context) error {
 
 func (a *App) closeAuction(ctx context.Context, auc auction.Auction) error {
 	return a.repos.TxManager.WithTx(ctx, func(ctx context.Context, repos repository.Repositories) error {
-		// re-read with FOR UPDATE inside tx
 		auc, err := repos.Auction.GetByIDForUpdate(ctx, auc.ID)
 		if err != nil {
 			return fmt.Errorf("get auction: %w", err)

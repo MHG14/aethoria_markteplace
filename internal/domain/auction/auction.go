@@ -20,11 +20,12 @@ type Auction struct {
 }
 
 func (a *Auction) MinNextBid() int64 {
-	base := a.StartingPrice
-	if a.HighestBid > 0 {
-		base = a.HighestBid
+	if a.HighestBid == 0 {
+		return a.StartingPrice
 	}
-	return base + (base / 20) // +5%
+
+	// must be at least 5% above current highest
+	return a.HighestBid + (a.HighestBid / 20)
 }
 
 func (a *Auction) PlaceBid(guildID int64, amount int64, now time.Time) error {
@@ -37,10 +38,14 @@ func (a *Auction) PlaceBid(guildID int64, amount int64, now time.Time) error {
 	if amount < a.MinNextBid() {
 		return ErrBidTooLow
 	}
+
 	a.HighestBid = amount
 	a.HighestBidderID = &guildID
+
+	// extend from EndTime, not from now
 	if a.EndTime.Sub(now) < extendWindow {
-		a.EndTime = now.Add(extendWindow)
+		a.EndTime = a.EndTime.Add(extendWindow)
 	}
+
 	return nil
 }

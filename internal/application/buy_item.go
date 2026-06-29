@@ -20,7 +20,6 @@ type BuyItemResponse struct {
 }
 
 func (a *App) BuyItem(ctx context.Context, req BuyItemRequest) (BuyItemResponse, error) {
-	// reads and validation outside tx
 	l, err := a.repos.Listing.GetByID(ctx, req.ListingID)
 	if err != nil {
 		return BuyItemResponse{}, fmt.Errorf("listing not found: %w", ErrNotFound)
@@ -45,7 +44,6 @@ func (a *App) BuyItem(ctx context.Context, req BuyItemRequest) (BuyItemResponse,
 
 	var t trade.Trade
 	err = a.repos.TxManager.WithTx(ctx, func(ctx context.Context, repos repository.Repositories) error {
-		// re-read with FOR UPDATE inside tx
 		l, err := repos.Listing.GetByIDForUpdate(ctx, req.ListingID)
 		if err != nil {
 			return fmt.Errorf("listing not found: %w", ErrNotFound)

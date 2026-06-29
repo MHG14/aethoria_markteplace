@@ -61,7 +61,6 @@ func (a *App) CreateAuction(ctx context.Context, req CreateAuctionRequest) (Crea
 			return ErrItemNotAvailable
 		}
 
-		// enforce one active auction per legendary item
 		if _, err = repos.Auction.GetActiveByItemID(ctx, req.ItemID); err == nil {
 			return ErrActiveAuctionExists
 		}
